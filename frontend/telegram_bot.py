@@ -57,13 +57,20 @@ async def audio(message: types.Message):
 
     file = await bot.get_file(file_id)
     file_path = file.file_path
-    destination = data_path / f"audio.mp3"
+    destination = data_path / f"audio_{user_id}.mp3"
 
     await bot.download_file(file_path, destination=destination)
 
     data_last_meas = datetime.now()
     res_last_meas = True # Обращение к API
     result_meas = ResultMeas(data_last_meas=data_last_meas, res_last_meas=res_last_meas)
+
+    if res_last_meas:
+        message_res = "У вас обнаружена картавость!"
+    else:
+        message_res = "У вас не обнаружено картавости!"
+
+    await message.reply(text=message_res)
 
     save_data(users_path, user_id, result_meas)
 
