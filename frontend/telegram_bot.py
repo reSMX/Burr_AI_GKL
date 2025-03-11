@@ -25,7 +25,7 @@ dp = Dispatcher()
 @dp.message(Command("start"))
 async def start_message(message: types.Message):
     await message.answer(
-        text="Привет! 👋\nОтправь голосовое сообщение или файл формата .mp3 для распознавания дефектов речи!",
+        text="<b>Привет!</b> 👋\nОтправь голосовое сообщение или файл формата .mp3 для распознавания дефектов речи!\nНапиши /profile чтобы узнать время и результат последней проверки!",
         parse_mode=ParseMode.HTML
     )
 
@@ -41,12 +41,13 @@ async def profile_message(message: types.Message):
             res_last_meas=result.res_last_meas
         )
 
-        message_res = f"Дата последней проверки: {result_meas.data_last_meas.strftime('%Y-%m-%d %H:%M')}, обнаружена ли картавость: {'да' if result_meas.res_last_meas else 'нет'}"
+        message_res = f"<b>Дата последней проверки:</b> {result_meas.data_last_meas.strftime('%Y-%m-%d %H:%M')}\n<b>Обнаружена ли картавость:</b> {'да' if result_meas.res_last_meas else 'нет'}"
     else:
         message_res = "Вы еще не проверяли есть ли у вас картавость"
 
     await message.answer(
-        text=message_res
+        text=message_res,
+        parse_mode=ParseMode.HTML
     )
 
 
@@ -66,11 +67,14 @@ async def audio(message: types.Message):
     result_meas = ResultMeas(data_last_meas=data_last_meas, res_last_meas=res_last_meas)
 
     if res_last_meas:
-        message_res = "У вас обнаружена картавость!"
+        message_res = "<b>У вас обнаружена картавость</b>❌"
     else:
-        message_res = "У вас не обнаружено картавости!"
+        message_res = "<b>У вас не обнаружено картавости</b>✅"
 
-    await message.reply(text=message_res)
+    await message.reply(
+        text=message_res,
+        parse_mode=ParseMode.HTML
+    )
 
     save_data(users_path, user_id, result_meas)
 
