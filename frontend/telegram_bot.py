@@ -11,9 +11,9 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.filters.command import Command
 from aiogram.enums import ParseMode
 
-from backend.get_user_data import get_data, save_data
+from backend.user_data_service import get_data, save_data
 from backend.models import ResultMeas
-from backend.trans_audio import trans_audio
+from backend.audio_service import trans_audio
 
 project_path = Path.cwd().parent
 data_path = project_path / "data"
@@ -74,22 +74,24 @@ async def audio(message: types.Message):
     })
 
     response = requests.post(url=f"http://127.0.0.1:8000/libr_audio/", data=data)
-    print(response.status_code)
 
-    res_last_meas = response.json()["burr"]
-    result_meas = ResultMeas(data_last_meas=data_last_meas, res_last_meas=res_last_meas)
+    if response.status_code == 200:
+        res_last_meas = response.json()["burr"]
+        result_meas = ResultMeas(data_last_meas=data_last_meas, res_last_meas=res_last_meas)
 
-    if res_last_meas:
-        message_res = "<b>У вас обнаружена картавость</b>❌"
+        if res_last_meas:
+            message_res = "<b>У вас обнаружена картавость</b>❌"
+        else:
+            message_res = "<b>У вас не обнаружено картавости</b>✅"
+
+        save_data(users_path, user_id, result_meas)
     else:
-        message_res = "<b>У вас не обнаружено картавости</b>✅"
+        message_res = "<b>Неудачное подключение к модели</b>❌"
 
     await message.reply(
         text=message_res,
         parse_mode=ParseMode.HTML
     )
-
-    save_data(users_path, user_id, result_meas)
 
     if destination.exists():
         destination.unlink()

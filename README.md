@@ -12,3 +12,13 @@ TOKEN="YOUR_TOKEN"
 ```bash
 pip install -r requirements.txt
 ```
+
+### 4. Загрузите uvicorn:
+```bash
+pip install uvicorn
+```
+
+### 5. Запустите FastAPI:
+```bash
+uvicorn main:app
+```
