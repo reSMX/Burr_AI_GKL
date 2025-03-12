@@ -1,3 +1,5 @@
+import json
+
 import dotenv
 import asyncio
 import os
@@ -11,6 +13,7 @@ from aiogram.enums import ParseMode
 
 from backend.get_user_data import get_data, save_data
 from backend.models import ResultMeas
+from backend.trans_audio import trans_audio
 
 project_path = Path.cwd().parent
 data_path = project_path / "data"
@@ -63,7 +66,17 @@ async def audio(message: types.Message):
     await bot.download_file(file_path, destination=destination)
 
     data_last_meas = datetime.now()
-    res_last_meas = True # Обращение к API
+    translated_audio, sr = trans_audio(destination)
+
+    data = json.dumps({
+        "y": translated_audio,
+        "sr": sr
+    })
+
+    response = requests.post(url=f"http://127.0.0.1:8000/libr_audio/", data=data)
+    print(response.status_code)
+
+    res_last_meas = response.json()["burr"]
     result_meas = ResultMeas(data_last_meas=data_last_meas, res_last_meas=res_last_meas)
 
     if res_last_meas:
