@@ -2,8 +2,6 @@ from pydantic import BaseModel
 from typing import Union
 from datetime import datetime
 
-import numpy as np
-
 
 class AudioFile(BaseModel):
     y: Union[list | None] = None
