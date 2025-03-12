@@ -11,6 +11,7 @@ from aiogram.enums import ParseMode
 
 from backend.get_user_data import get_data, save_data
 from backend.models import ResultMeas
+from backend.trans_audio import trans_audio
 
 project_path = Path.cwd().parent
 data_path = project_path / "data"
@@ -63,6 +64,9 @@ async def audio(message: types.Message):
     await bot.download_file(file_path, destination=destination)
 
     data_last_meas = datetime.now()
+    translated_audio = trans_audio(destination)
+
+
     res_last_meas = True # Обращение к API
     result_meas = ResultMeas(data_last_meas=data_last_meas, res_last_meas=res_last_meas)
 
