@@ -5,6 +5,7 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 import seaborn as sns
 import matplotlib.pyplot as plt
 import joblib
+from catboost import CatBoostClassifier, Pool
 
 try:
     df = pd.read_csv('database.csv')
@@ -15,9 +16,12 @@ except FileNotFoundError:
 X = df.drop('class', axis=1)
 y = df['class']
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
-
-model = RandomForestClassifier(random_state=42)
+model = CatBoostClassifier(iterations=3,
+                           depth=16,
+                           learning_rate=1,
+                           loss_function='Logloss',
+                           verbose=True)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, stratify=y)
 model.fit(X_train, y_train)
 
 model_filename = 'audio_classifier_model.joblib'
