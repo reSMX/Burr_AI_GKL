@@ -1,19 +1,21 @@
-import joblib
 import pandas as pd
 import librosa
 from pathlib import Path
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+from catboost import CatBoostClassifier, Pool
 
 
 def predict(model, features_list):
     features_df = pd.DataFrame([features_list])
-    scaler = StandardScaler()
+    scaler = MinMaxScaler(feature_range=(-1, 1))
     features_scaled = scaler.fit_transform(features_df)
-    return model.predict(features_scaled)
+    pool = Pool(data=features_scaled)
+    return model.predict(pool)
 
 
 def get(input_features):
-    model = joblib.load('learn_model/audio_classifier_model.joblib')
+    model = CatBoostClassifier()
+    model.load_model('learn_model/audio_classifier_model.cbm')
     return predict(model, input_features)
 
 
